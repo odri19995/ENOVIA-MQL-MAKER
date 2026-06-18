@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Attribute MQL Generator</title>
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --text: #20242a;
+      --muted: #5d6673;
+      --line: #d9dee7;
+      --accent: #2563eb;
+      --accent-dark: #1d4ed8;
+      --danger: #b91c1c;
+      --code: #111827;
+      --code-text: #e5e7eb;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", Arial, sans-serif;
+      font-size: 14px;
+    }
+
+    header {
+      height: 56px;
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(360px, 480px) minmax(420px, 1fr);
+      gap: 16px;
+      padding: 16px;
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+
+    section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      min-width: 0;
+    }
+
+    .form-panel {
+      padding: 16px;
+    }
+
+    .preview-panel {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      min-height: calc(100vh - 88px);
+    }
+
+    .panel-title {
+      margin: 0 0 12px;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    input,
+    select {
+      width: 100%;
+      height: 36px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 0 10px;
+      color: var(--text);
+      background: #fff;
+      font: inherit;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: 2px solid rgba(37, 99, 235, 0.18);
+      border-color: var(--accent);
+    }
+
+    .checks {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      margin-top: 4px;
+    }
+
+    .check {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .check input {
+      width: 16px;
+      height: 16px;
+      padding: 0;
+    }
+
+    .range-box {
+      margin-top: 16px;
+      border-top: 1px solid var(--line);
+      padding-top: 16px;
+    }
+
+    .range-input {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+    }
+
+    .range-list {
+      display: grid;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .range-item {
+      display: grid;
+      grid-template-columns: 1fr 32px;
+      gap: 8px;
+      align-items: center;
+      min-height: 32px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 0 0 0 10px;
+      background: #fbfcfe;
+    }
+
+    .range-value {
+      overflow-wrap: anywhere;
+    }
+
+    button {
+      height: 36px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 0 12px;
+      background: #fff;
+      color: var(--text);
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:hover {
+      border-color: #b8c0cc;
+      background: #f8fafc;
+    }
+
+    button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #fff;
+    }
+
+    button.primary:hover {
+      border-color: var(--accent-dark);
+      background: var(--accent-dark);
+    }
+
+    button.icon {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      color: var(--danger);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      padding: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .status {
+      min-width: 160px;
+      color: var(--muted);
+      margin-left: auto;
+      text-align: right;
+      overflow-wrap: anywhere;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100%;
+      min-height: 480px;
+      resize: none;
+      border: 0;
+      padding: 16px;
+      background: var(--code);
+      color: var(--code-text);
+      font: 13px/1.5 Consolas, "Courier New", monospace;
+      tab-size: 4;
+    }
+
+    @media (max-width: 920px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+
+      .preview-panel {
+        min-height: 520px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Attribute MQL Generator</h1>
+  </header>
+
+  <main>
+    <section class="form-panel">
+      <h2 class="panel-title">Attribute</h2>
+      <div class="grid">
+        <div class="field full">
+          <label for="attributeName">Name</label>
+          <input id="attributeName" value="custSampleAttribute" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="descriptionKo">Description KO</label>
+          <input id="descriptionKo" value="샘플 속성" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="descriptionEn">Description EN</label>
+          <input id="descriptionEn" value="Sample Attribute" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="attributeType">Type</label>
+          <select id="attributeType">
+            <option value="string">string</option>
+            <option value="date">date</option>
+            <option value="integer">integer</option>
+            <option value="real">real</option>
+            <option value="boolean">boolean</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="defaultValue">Default</label>
+          <input id="defaultValue" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="createdDate">Created Date</label>
+          <input id="createdDate" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="installedDate">Installed Date</label>
+          <input id="installedDate" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="createdBy">Create by</label>
+          <input id="createdBy" value="USER" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="application">Application</label>
+          <input id="application" value="Framework" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="version">Version</label>
+          <input id="version" value="R2026x" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="installer">Installer</label>
+          <input id="installer" value="CUST" autocomplete="off">
+        </div>
+        <div class="field full">
+          <div class="checks">
+            <label class="check"><input id="multiline" type="checkbox"> multiline</label>
+            <label class="check"><input id="hidden" type="checkbox"> hidden</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="range-box">
+        <h2 class="panel-title">Range</h2>
+        <div class="range-input">
+          <input id="rangeInput" autocomplete="off">
+          <button id="addRange" type="button">Add</button>
+        </div>
+        <div id="rangeList" class="range-list"></div>
+      </div>
+    </section>
+
+    <section class="preview-panel">
+      <div class="actions">
+        <button id="copyMql" type="button">Copy</button>
+        <button id="downloadMql" type="button" class="primary">Download</button>
+        <button id="saveMql" type="button">Save As</button>
+        <span id="status" class="status"></span>
+      </div>
+      <textarea id="preview" spellcheck="false"></textarea>
+    </section>
+  </main>
+
+  <script>
+    const template = `################################################################################################
+# Created Date : {{CREATED_DATE}}
+# Create by {{CREATED_BY}}
+# Description : {{DESCRIPTION_KO}}
+################################################################################################
+#del attribute '{{ATTRIBUTE_NAME}}';
+add attribute '{{ATTRIBUTE_NAME}}'
+    description '{{DESCRIPTION_EN}}'{{DESCRIPTION_COMMENT}}
+    type '{{ATTRIBUTE_TYPE}}'
+    default '{{DEFAULT_VALUE}}'
+{{RANGES}}    {{MULTILINE_FLAG}}
+    {{HIDDEN_FLAG}}
+    property    'application'    value '{{APPLICATION}}'
+    property    'version'        value '{{VERSION}}'
+    property    'installer'      value '{{INSTALLER}}'
+    property    'installed date' value '{{INSTALLED_DATE}}'
+    property    'original name'  value '{{ATTRIBUTE_NAME}}'
+;
+add property 'attribute_{{ATTRIBUTE_NAME}}' on program eServiceSchemaVariableMapping.tcl to attribute '{{ATTRIBUTE_NAME}}';`;
+
+    const fields = {
+      attributeName: document.querySelector('#attributeName'),
+      descriptionKo: document.querySelector('#descriptionKo'),
+      descriptionEn: document.querySelector('#descriptionEn'),
+      attributeType: document.querySelector('#attributeType'),
+      defaultValue: document.querySelector('#defaultValue'),
+      createdDate: document.querySelector('#createdDate'),
+      installedDate: document.querySelector('#installedDate'),
+      createdBy: document.querySelector('#createdBy'),
+      application: document.querySelector('#application'),
+      version: document.querySelector('#version'),
+      installer: document.querySelector('#installer'),
+      multiline: document.querySelector('#multiline'),
+      hidden: document.querySelector('#hidden'),
+      rangeInput: document.querySelector('#rangeInput'),
+      rangeList: document.querySelector('#rangeList'),
+      preview: document.querySelector('#preview'),
+      status: document.querySelector('#status')
+    };
+
+    const ranges = [];
+
+    function pad(value) {
+      return String(value).padStart(2, '0');
+    }
+
+    function setDefaultDates() {
+      const now = new Date();
+      fields.createdDate.value = `${now.getFullYear()}.${pad(now.getMonth() + 1)}.${pad(now.getDate())}`;
+      fields.installedDate.value = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+    }
+
+    function escapeMql(value) {
+      return String(value ?? '').replaceAll("'", "''");
+    }
+
+    function fileName() {
+      const name = fields.attributeName.value.trim() || 'attribute';
+      return `${name}.mql`;
+    }
+
+    function renderRanges() {
+      fields.rangeList.replaceChildren();
+      ranges.forEach((value, index) => {
+        const item = document.createElement('div');
+        item.className = 'range-item';
+
+        const text = document.createElement('span');
+        text.className = 'range-value';
+        text.textContent = value;
+
+        const remove = document.createElement('button');
+        remove.className = 'icon';
+        remove.type = 'button';
+        remove.textContent = '×';
+        remove.title = 'Remove';
+        remove.addEventListener('click', () => {
+          ranges.splice(index, 1);
+          renderRanges();
+          updatePreview();
+        });
+
+        item.append(text, remove);
+        fields.rangeList.append(item);
+      });
+    }
+
+    function buildMql() {
+      const descriptionKo = fields.descriptionKo.value.trim();
+      const descriptionEn = fields.descriptionEn.value.trim();
+      const descriptionComment = descriptionKo && descriptionKo !== descriptionEn ? ` #${descriptionKo}` : '';
+      const rangeText = ranges.map((value) => `    range = '${escapeMql(value)}'\r\n`).join('');
+
+      const tokens = {
+        '{{CREATED_DATE}}': fields.createdDate.value.trim(),
+        '{{CREATED_BY}}': fields.createdBy.value.trim(),
+        '{{DESCRIPTION_KO}}': descriptionKo,
+        '{{ATTRIBUTE_NAME}}': fields.attributeName.value.trim(),
+        '{{DESCRIPTION_EN}}': descriptionEn,
+        '{{DESCRIPTION_COMMENT}}': descriptionComment,
+        '{{ATTRIBUTE_TYPE}}': fields.attributeType.value,
+        '{{DEFAULT_VALUE}}': escapeMql(fields.defaultValue.value),
+        '{{RANGES}}': rangeText,
+        '{{MULTILINE_FLAG}}': fields.multiline.checked ? 'multiline' : 'notmultiline',
+        '{{HIDDEN_FLAG}}': fields.hidden.checked ? 'hidden' : 'nothidden',
+        '{{APPLICATION}}': fields.application.value.trim(),
+        '{{VERSION}}': fields.version.value.trim(),
+        '{{INSTALLER}}': fields.installer.value.trim(),
+        '{{INSTALLED_DATE}}': fields.installedDate.value.trim()
+      };
+
+      return Object.entries(tokens).reduce((content, [key, value]) => {
+        return content.replaceAll(key, value);
+      }, template);
+    }
+
+    function updatePreview() {
+      fields.preview.value = buildMql();
+    }
+
+    function addRange() {
+      const value = fields.rangeInput.value;
+      if (!value) {
+        return;
+      }
+
+      ranges.push(value);
+      fields.rangeInput.value = '';
+      renderRanges();
+      updatePreview();
+      fields.rangeInput.focus();
+    }
+
+    async function copyMql() {
+      await navigator.clipboard.writeText(fields.preview.value);
+      setStatus('Copied');
+    }
+
+    function downloadMql() {
+      const blob = new Blob([fields.preview.value], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName();
+      document.body.append(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      setStatus(`Downloaded ${fileName()}`);
+    }
+
+    async function saveMql() {
+      if (!window.showSaveFilePicker) {
+        downloadMql();
+        return;
+      }
+
+      const handle = await window.showSaveFilePicker({
+        suggestedName: fileName(),
+        types: [{ description: 'MQL', accept: { 'text/plain': ['.mql'] } }]
+      });
+      const writable = await handle.createWritable();
+      await writable.write(fields.preview.value);
+      await writable.close();
+      setStatus(`Saved ${fileName()}`);
+    }
+
+    function setStatus(message) {
+      fields.status.textContent = message;
+      window.clearTimeout(setStatus.timer);
+      setStatus.timer = window.setTimeout(() => {
+        fields.status.textContent = '';
+      }, 2400);
+    }
+
+    document.querySelector('#addRange').addEventListener('click', addRange);
+    document.querySelector('#copyMql').addEventListener('click', copyMql);
+    document.querySelector('#downloadMql').addEventListener('click', downloadMql);
+    document.querySelector('#saveMql').addEventListener('click', saveMql);
+    fields.rangeInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        addRange();
+      }
+    });
+
+    Object.values(fields).forEach((field) => {
+      if (field instanceof HTMLInputElement || field instanceof HTMLSelectElement) {
+        field.addEventListener('input', updatePreview);
+        field.addEventListener('change', updatePreview);
+      }
+    });
+
+    setDefaultDates();
+    updatePreview();
+  </script>
+</body>
+</html>
